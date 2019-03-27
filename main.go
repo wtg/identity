@@ -18,6 +18,7 @@ type Config struct {
 	CMSUrl string
 	CMSKey string
 	Port   int
+	APIKey string
 }
 
 // CMSResponse Holds information from a cms response
@@ -48,6 +49,14 @@ type RCSPostBody struct {
 
 // ValidRCSChecker checks if the rcs id is valid
 func (a *API) ValidRCSChecker(w http.ResponseWriter, r *http.Request) {
+	key := r.Header.Get("Authorization")
+	if key != "Token "+a.Config.APIKey {
+		w.WriteHeader(403)
+		w.Write([]byte("invalid key"))
+		log.Info("User tried accessing without api key")
+		return
+	}
+
 	var postData RCSPostBody
 	err := json.NewDecoder(r.Body).Decode(&postData)
 	if err != nil {
@@ -131,6 +140,7 @@ func main() {
 	v.SetDefault("port", 8080)
 	v.BindEnv("CMSURL")
 	v.BindEnv("CMSKEY")
+	v.BindEnv("APIKEY")
 
 	var config Config
 	if err := v.ReadInConfig(); err != nil {
