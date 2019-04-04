@@ -23,10 +23,11 @@ type Config struct {
 
 // CMSResponse Holds information from a cms response
 type CMSResponse struct {
-	InvalidRCS bool   // CMS will return an empty response if the RCS id is invalid
-	UserType   string `json:"user_type"`
-	FirstName  string `json:"first_name"`
-	LastName   string `json:"last_name"`
+	Error     bool
+	Message   string
+	UserType  string `json:"user_type"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
 }
 
 // CacheObject represents a cache entry for a cms response
@@ -104,7 +105,8 @@ func (a *API) ValidRCSChecker(w http.ResponseWriter, r *http.Request) {
 	err = json.NewDecoder(resp.Body).Decode(&cmsResp)
 	if err != nil {
 		log.Printf("Empty CMS response, is %s a valid RCS ID?\n", "lyonj4")
-		cmsResp.InvalidRCS = true // This is likely not perfect, but if we don't get a json response from cms it is pretty safe to assume it is an invalid rcs
+		cmsResp.Error = true // This is likely not perfect, but if we don't get a json response from cms it is pretty safe to assume it is an invalid rcs
+		cmsResp.Message = "Invalid RCS ID"
 	}
 
 	c := CacheObject{
