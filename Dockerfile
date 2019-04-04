@@ -8,4 +8,4 @@ COPY . .
 
 RUN go build .
 
-CMD ["identity"]
+CMD ["/app/identity"]
