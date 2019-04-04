@@ -21,10 +21,14 @@ type Config struct {
 	APIKey string
 }
 
+// CMSError returns an error from cms
+type CMSError struct {
+	Error   bool
+	Message string
+}
+
 // CMSResponse Holds information from a cms response
 type CMSResponse struct {
-	Error     bool
-	Message   string
 	UserType  string `json:"user_type"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
@@ -105,8 +109,12 @@ func (a *API) ValidRCSChecker(w http.ResponseWriter, r *http.Request) {
 	err = json.NewDecoder(resp.Body).Decode(&cmsResp)
 	if err != nil {
 		log.Printf("Empty CMS response, is %s a valid RCS ID?\n", "lyonj4")
-		cmsResp.Error = true // This is likely not perfect, but if we don't get a json response from cms it is pretty safe to assume it is an invalid rcs
-		cmsResp.Message = "Invalid RCS ID"
+		x := CMSError{
+			Error:   true,
+			Message: "Invalid RCS ID",
+		}
+		WriteJSON(w, x)
+		return
 	}
 
 	c := CacheObject{
