@@ -23,8 +23,8 @@ type Config struct {
 
 // CMSError returns an error from cms
 type CMSError struct {
-	Error   bool
-	Message string
+	Error   bool   `json: "error"`
+	Message string `json: "message"`
 }
 
 // CMSResponse Holds information from a cms response
