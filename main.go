@@ -53,6 +53,11 @@ type RCSPostBody struct {
 	RCSID string `json:"rcs_id"`
 }
 
+// IndexHandler serves index.html
+func (a *API) IndexHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "index.html")
+}
+
 // ValidRCSChecker checks if the rcs id is valid
 func (a *API) ValidRCSChecker(w http.ResponseWriter, r *http.Request) {
 	key := r.Header.Get("Authorization")
@@ -167,6 +172,7 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Get("/valid/{rcsid}", api.ValidRCSChecker)
+	r.Get("/", api.IndexHandler)
 	log.Info("Serving at ", "0.0.0.0:"+strconv.Itoa(config.Port))
 
 	if err := http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Port), r); err != nil {
