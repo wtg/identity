@@ -10,6 +10,11 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,800" rel="stylesheet">
 
     <style>
+        html,body{
+            height: 100%;
+            padding: 0px;
+            margin: 0px;
+        }
         .has-text-wtg {
             color: #ED1C24;
         }
@@ -23,23 +28,33 @@
             font-family: 'Open Sans', sans-serif;
             font-weight: 600;
         }
+
+        .container-flex{
+            display: flex;
+            flex-flow: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .is-super-large{
+            font-size: 5rem!important;
+        }
+        .is-less-super-large{
+            font-size: 1.5rem!important;
+        }
     </style>
 </head>
 
 <body>
-    <section class="section">
-        <div class="container has-text-centered">
-            <h1 class="title wtg-font-bold">
+    <section style="height: 100%;" class="section">
+        <div style="height: 100%;" class="container-flex container has-text-centered">
+            <h1 class="title wtg-font-bold is-super-large">
                 Identity
             </h1>
-            <p class="subtitle wtg-font">
+            <p class="subtitle wtg-font is-less-super-large">
                 A <a href="https://github.com/wtg/" class="has-text-wtg">WebTech</a> project. See more <a
                     class="has-text-wtg" href="https://www.github.com/wtg/identity">here</a>.
             </p>
-            <a href="https://github.com/wtg/">
-                <img style="width: 100px;" src="https://webtech.union.rpi.edu/static/wtg.svg" />
-
-            </a>
         </div>
 
     </section>
