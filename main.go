@@ -63,20 +63,10 @@ func (a *API) ValidRCSChecker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var postData RCSPostBody
-	err := json.NewDecoder(r.Body).Decode(&postData)
-	if err != nil {
-		w.WriteHeader(400)
-		w.Write([]byte(err.Error()))
-		return
-	}
-	if postData.RCSID == "" {
-		w.WriteHeader(400)
-		return
-	}
+	rcs := chi.URLParam(r, "rcsid")
 	// Check cache
 	for idx, entry := range a.cache {
-		if entry.RCSID == postData.RCSID {
+		if entry.RCSID == rcs {
 			if time.Now().After(entry.Expiration) {
 				log.Info("Cache expired for ", entry.RCSID)
 				a.cache = append(a.cache[:idx], a.cache[idx+1:]...)
@@ -89,11 +79,11 @@ func (a *API) ValidRCSChecker(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// wasn't in cache, find it and add it
-	req, err := http.NewRequest("GET", "https://cms.union.rpi.edu/api/users/view_rcs/"+postData.RCSID+"/", nil)
+	req, err := http.NewRequest("GET", "https://cms.union.rpi.edu/api/users/view_rcs/"+rcs+"/", nil)
 	if err != nil {
 		log.Fatalf("Failed to create http request")
 	}
-	log.Info("https://cms.union.rpi.edu/api/users/view_rcs/" + postData.RCSID + "/")
+	log.Info("Grabbing identity for: " + rcs)
 	req.Header.Set("Authorization", "Token "+a.Config.CMSKey)
 
 	client := &http.Client{Timeout: 10 * time.Second}
@@ -109,7 +99,7 @@ func (a *API) ValidRCSChecker(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewDecoder(resp.Body).Decode(&cmsResp)
 	if err != nil {
-		log.Printf("Empty CMS response, is %s a valid RCS ID?\n", "lyonj4")
+		log.Printf("Empty CMS response, is %s a valid RCS ID?\n", rcs)
 		x := CMSError{
 			Error:   true,
 			Message: "Invalid RCS ID",
@@ -119,10 +109,11 @@ func (a *API) ValidRCSChecker(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c := CacheObject{
-		RCSID:      postData.RCSID,
+		RCSID:      rcs,
 		Expiration: time.Now().Add(48 * time.Hour),
 		CMSValue:   cmsResp,
 	}
+	log.Info("Caching: " + rcs)
 	a.cache = append(a.cache, c)
 
 	WriteJSON(w, c.CMSValue)
@@ -175,7 +166,7 @@ func main() {
 	}
 
 	r := chi.NewRouter()
-	r.Post("/valid", api.ValidRCSChecker)
+	r.Get("/valid/{rcsid}", api.ValidRCSChecker)
 	log.Info("Serving at ", "0.0.0.0:"+strconv.Itoa(config.Port))
 
 	if err := http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Port), r); err != nil {
