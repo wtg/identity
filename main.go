@@ -29,10 +29,12 @@ type CMSError struct {
 
 // CMSResponse Holds information from a cms response
 type CMSResponse struct {
-	Error     bool   `json:"error"`
-	UserType  string `json:"user_type"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	Error     		  bool   `json:"error"`
+	UserType  		  string `json:"user_type"`
+	FirstName 		  string `json:"first_name"`
+	LastName  		  string `json:"last_name"`
+	EntryDate 		  string `json:"entry_date"`
+	ClassYearByCredit string `json:"class_by_credit"`
 }
 
 // CacheObject represents a cache entry for a cms response
